@@ -4,7 +4,7 @@ exports.up = function(knex) {
     table.integer('sub_event_id').unsigned().notNullable();
     table.foreign('sub_event_id').references('id').inTable('sub_events');
     table.enum('block', ['A', 'B', 'C', 'D', 'G']).notNullable();
-    table.string('floor').notNullable();
+    table.string('room').notNullable(); //Room ficaria mais intuitivo
     table.timestamps(true, true);
   });
 };
