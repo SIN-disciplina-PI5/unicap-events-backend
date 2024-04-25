@@ -5,8 +5,8 @@ exports.up = function(knex) {
     table.foreign('user_id').references('id').inTable('users');
     table.integer('sub_event_id').unsigned();
     table.foreign('sub_event_id').references('id').inTable('sub_events');
-    table.datetime('created_at').defaultTo(knex.fn.now());
     table.string('verification_code').notNullable().unique();
+    table.timestamps(true, true);
   });
 };
 

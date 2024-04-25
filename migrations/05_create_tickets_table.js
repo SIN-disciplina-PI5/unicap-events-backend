@@ -7,7 +7,7 @@ exports.up = function(knex) {
     table.foreign('sub_event_id').references('id').inTable('sub_events');
     table.string('status').notNullable();
     table.string('codigo_ingresso').unique();
-    table.datetime('created_at').defaultTo(knex.fn.now());
+    table.timestamps(true, true);
   });
 };
 

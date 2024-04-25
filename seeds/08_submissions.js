@@ -3,8 +3,8 @@ exports.seed = function(knex) {
       .then(function () {
         return knex('submissions').insert([
           {
-            user_id: 12323,
-            sub_event_id: 21,
+            user_id: 1,
+            sub_event_id: 1,
             work_title: 'My Awesome Artwork',
             description: 'This is a description of my awesome artwork.',
             archive: 'https://www.faeterj-rio.edu.br/downloads/bbv/0031.pdf',
@@ -12,8 +12,8 @@ exports.seed = function(knex) {
             status: 'Pending'
           },
           {
-            user_id: 232323,
-            sub_event_id: 232,
+            user_id: 2,
+            sub_event_id: 2,
             work_title: 'My Amazing Story',
             description: 'This is a description of my amazing short story.',
             archive: 'http://antigo.scl.ifsp.edu.br/portal/arquivos/2016.05.04_Apostila_Python_-_PET_ADS_S%C3%A3o_Carlos.pdf',
@@ -21,8 +21,8 @@ exports.seed = function(knex) {
             status: 'Approved'
           },
           {
-            user_id: 33242,
-            sub_event_id: null,
+            user_id: 2,
+            sub_event_id: 1,
             work_title: 'Untitled Photograph',
             description: 'This is a description of my untitled photograph.',
             archive: 'https://people.cs.aau.dk/~torp/Teaching/E03/OOP/handouts/introduction.pdf',
