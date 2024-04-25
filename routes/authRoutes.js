@@ -10,7 +10,7 @@ function validateLogin(req, res, next) {
     loginSchema.parse(req.body);
     next();
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: JSON.parse(error.message) });
   }
 }
 
@@ -20,7 +20,7 @@ function validateRegister(req, res, next) {
     registerSchema.parse(req.body);
     next();
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: JSON.parse(error.message) });
   }
 }
 

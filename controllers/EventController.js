@@ -23,7 +23,7 @@ exports.show = async (req, res) => {
     if (!event) {
       res.status(404).json({ error: 'Evento não encontrado' });
     }
-    res.json(event);
+    res.json({data: event});
 
   } catch (error) {
     console.error('Erro ao obter o evento:', error);
@@ -35,10 +35,11 @@ exports.show = async (req, res) => {
 exports.create = async (req, res) => {
   const eventData = req.body;
   try {
-    // Inserir o evento no banco de dados
-    const [eventId] = await db('events').insert(validatedData);
 
-    res.status(201).json({ id: eventId, eventData });
+    // Inserir o evento no banco de dados
+    await db('events').insert(eventData);
+
+    res.status(201).json({ success: true, message: "evento criado com sucesso"});
 
   } catch (error) {
     console.error('Erro ao criar o evento:', error);
@@ -57,13 +58,10 @@ exports.update = async (req, res) => {
     if (!existingEvent) {
       return res.status(404).json({ error: 'Evento não encontrado' });
     }
-
-    // Validar os dados do evento
-    const validatedData = eventSchema.parse(eventData);
     
     // Atualizar o evento no banco de dados
-    await db('events').where({ id: eventId }).update(validatedData);
-    res.json({ id: eventId, ...validatedData });
+    await db('events').where({ id: eventId }).update(eventData);
+    res.json({ success: true, message: 'alterado com sucesso' });
   } catch (error) {
     console.error('Erro ao atualizar o evento:', error);
     res.status(400).json({ error: 'Erro ao atualizar o evento', details: error });
@@ -81,7 +79,9 @@ exports.destroy = async (req, res) => {
     }
     // Excluir o evento do banco de dados
     await db('events').where({ id: eventId }).del();
+
     res.json({ message: 'Evento excluído com sucesso' });
+
   } catch (error) {
     console.error('Erro ao excluir o evento:', error);
     res.status(500).json({ error: 'Erro ao excluir o evento' });
