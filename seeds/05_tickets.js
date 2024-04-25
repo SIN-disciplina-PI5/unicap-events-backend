@@ -5,18 +5,20 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('tickets').insert([
         { 
-          event_id: 1, 
+          user_id: 1, 
           sub_event_id: 1, 
           status: 'reservado', 
           codigo_ingresso: 'abc123', 
-          created_at: new Date() 
+          created_at: new Date(),
+          updated_at: new Date(),
         },
         { 
-          event_id: 2, 
+          user_id: 2, 
           sub_event_id: 2, 
           status: 'aguardando pagamento', 
           codigo_ingresso: 'def456', 
-          created_at: new Date() 
+          created_at: new Date() ,
+          updated_at: new Date()
         },
         // Adicione mais ingressos falsos aqui, se necessário
       ]);

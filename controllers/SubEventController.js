@@ -6,9 +6,9 @@ const db = knex(knexFile);
 exports.index = async (req, res) => {
   try {
     const subEvents = await db('sub_events')
-                            .join('events', 'sub_events.event_id', '=', 'events.id')
+                            .join('events', 'sub_events.event_id', 'events.id')
                             .select('sub_events.*', 'events.*');
-
+console.log(subEvents);
     res.json({data: subEvents});
 
   } catch (error) {
