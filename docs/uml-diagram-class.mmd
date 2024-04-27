@@ -8,12 +8,19 @@ classDiagram
         -phone : varchar
         -type : varchar
         -permission : varchar
-        +createUser(name, email, password, phone, type, permission) : void
+        -isSuperAdmin : bool
+        +createUser(name, email, password, phone, type, permission, isSuperAdmin) : void
         +readUser(id) : User
-        +updateUser(id, name, email, password, phone, type, permission) : void
+        +updateUser(id, name, email, password, phone, type, permission, isSuperAdmin) : void
         +deleteUser(id) : void
         +getAllUsers() : User[]
         +importUsersFromCSV(csvFile) : void
+        +grantPermission(userId, permission) : void
+        +revokePermission(userId, permission) : void
+        +getAllPermissions(userId) : varchar[]
+        +grantSuperAdminStatus(userId) : void
+        +revokeSuperAdminStatus(userId) : void
+        +isSuperAdmin(userId) : bool
     }
 
     class Order {
@@ -117,6 +124,22 @@ classDiagram
         +getAllAddresses() : Address[]
     }
 
+    class Attendance {
+        -id : int
+        -userId : int
+        -subEventId : int
+        -checkinTime : datetime
+        -checkoutTime : datetime
+        +registerAttendance(userId, subEventId, checkinTime) : void
+        +checkoutAttendance(attendanceId, checkoutTime) : void
+        +readAttendance(id) : Attendance
+        +updateAttendance(id, userId, subEventId, checkinTime, checkoutTime) : void
+        +deleteAttendance(id) : void
+        +getAllAttendances() : Attendance[]
+        +getUserAttendances(userId) : Attendance[]
+        +getSubEventAttendances(subEventId) : Attendance[]
+    }
+
     User "1" --o "0..*" Order
     Order "1" --o "0..*" Ticket
     User "1" --o "0..*" Certificate
@@ -126,3 +149,5 @@ classDiagram
     Submission "0..*" --o "0..1" SubEvent
     Event "1" --o "0..*" SubEvent
     SubEvent "1" --o "0..*" Address
+    User "1" --o "0..*" Attendance
+    Attendance "0..*" --o "1" SubEvent
