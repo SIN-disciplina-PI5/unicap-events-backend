@@ -1,0 +1,78 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Universidade Católica de Pernambuco
+% UNICAP 
+% Sistemas para Internet
+%
+% Disciplina de Projeto Integrador
+% Versión 0.0.1 14/04/24
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[letterpaper, margin=30mm]{geometry}
+\usepackage{csquotes}
+\usepackage{graphicx}
+\usepackage{braket}
+\usepackage{hyperref}
+\DeclareUnicodeCharacter{0301}{\'{e}}
+
+\usepackage[
+sorting=none
+]{biblatex}
+
+\addbibresource{biblio.bib} %Imports bibliography file
+
+\graphicspath{{Figuras/}}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={unicap_events},
+    pdfpagemode=FullScreen,
+}
+    
+\urlstyle{same}
+
+\begin{document}
+
+
+\newcommand{\titulo}{Unicap Events}
+\newcommand{\nombreestudiante}{Aryel Miguel\\Elizabeth Kristen\\Ewellyn Michelle\\Gabriel José\\Klecio Henrique\\Larrissa Azevedo\\Maynan Taize\\}
+\newcommand{\fecha}{\date{\today}}
+
+
+\begin{titlepage}
+	\centering
+	\includegraphics[width=65mm]{figuras/icamTech.png}\par
+	\vspace{1cm}
+	{\LARGE\bfseries \titulo \par}
+	\vfill
+	{\large Relatório Técnico de Conclusão de Curso\\de Sistemas para Internet\par
+
+	\vfill
+	Equipe:\par\vspace{2mm}
+	\nombreestudiante\par
+    \vfill
+    Universidade Católica de Pernambuco\par
+    Sistemas para Internet \\ Data de Emissão: 00/00/0000
+	\date{\today}
+ \par}
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+% \listoftables
+
+\include{conteudo/Intro}
+\include{conteudo/TrabRel}
+\include{conteudo/Metodologia}
+\include{conteudo/Resultados}
+\include{conteudo/Conclusao}
+
+\printbibliography[heading=bibintoc, title={Referencias}]
+
+\end{document}

@@ -1,86 +1,96 @@
 erDiagram
-    Users ||--o{ Orders : has
-    Orders ||--o{ Tickets : has
-    Users ||--o{ Certificate : obtains
-    Sub_events ||--o{ Certificate : belongs_to
-    Users ||--o{ Submission : makes
-    Events ||--o{ Submission : belongs_to
-    Sub_events ||--|{ Submission : optionally_belongs_to
-    Events ||--|{ Sub_events : has
-    Sub_events ||--o{ Addresses : has
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ TICKET : contains
+    USER ||--o{ CERTIFICATE : receives
+    CERTIFICATE }|--|| SUB_EVENT : "for"
+    USER ||--o{ SUBMISSION : makes
+    SUBMISSION }|--|| EVENT : "for"
+    SUBMISSION ||--o{ SUB_EVENT : "for"
+    EVENT ||--|{ SUB_EVENT : contains
+    SUB_EVENT ||--|| ADDRESS : has
+    USER ||--o{ ATTENDANCE : registers
+    ATTENDANCE }|--|| SUB_EVENT : "for"
 
-    Users {
-        int id PK
+    USER {
+        int id
         varchar name
         varchar email
         varchar ra
-        varchar password
         varchar phone
         varchar type
         varchar permission
+        bool isSuperAdmin
     }
 
-    Orders {
-        int id PK
-        int user_id FK
-        int ticket_id FK
-        decimal total_value
-        varchar payment_method
-        varchar status_payment
-        datetime payment_at
+    ORDER {
+        int id
+        int userId
+        int ticketIds
+        decimal totalValue
+        varchar paymentMethod
+        varchar statusPayment
+        datetime paymentAt
         varchar code
     }
 
-    Tickets {
-        int id PK
-        int order_id FK
-        int sub_event_id FK 
+    TICKET {
+        int id
+        int orderId
+        int subEventId
         varchar status
-        varchar codigoingresso
-        datetime created_at
+        varchar codigoIngresso
+        datetime createdAt
     }
 
-    Certificate {
-        int id PK
-        int user_id FK
-        int sub_event_id FK
-        datetime created_at
-        uuid verification_code
+    CERTIFICATE {
+        int id
+        int userId
+        int subEventId
+        datetime createdAt
+        varchar verificationCode
     }
 
-    Submission {
-        int submission_id PK
-        int user_id FK
-        int sub_event_id FK
+    SUBMISSION {
+        int id
+        int userId
+        int subEventId
         varchar workTitle
         text description
         blob archive
-        datetime dataSubmission
+        datetime submissionDate
         varchar status
     }
 
-    Events {
-        int id PK
+    EVENT {
+        int id
         varchar name
         text description
-        datetime start_date
-        datetime end_date
+        datetime startDate
+        datetime endDate
     }
 
-    Sub_events {
-        int id PK
+    SUB_EVENT {
+        int id
         varchar name
         text description
-        datetime start_date
-        datetime end_date
-        int event_id FK
+        datetime startDate
+        datetime endDate
+        int eventId
         decimal value
         int quantity
     }
 
-    Addresses {
-        int id PK
-        int sub_event_id FK
+    ADDRESS {
+        int id
+        int subEventId
         varchar block
-        varchar room
+        varchar floor
+    }
+
+    ATTENDANCE {
+        int id
+        int userId
+        int subEventId
+        datetime checkinTime
+        datetime checkoutTime
     }
