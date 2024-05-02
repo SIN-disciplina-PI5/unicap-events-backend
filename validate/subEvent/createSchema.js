@@ -1,5 +1,11 @@
 const { z } = require('zod');
 
+// Esquema de validação para o endereço
+const addressSchema = z.object({
+  block: z.string().min(1),
+  room: z.string().min(1),
+});
+
 // Esquema de validação para os dados da tabela de subeventos
 const createSchema = z.object({
   name: z.string().min(1), // O nome é obrigatório e deve ter pelo menos 1 caractere
@@ -9,6 +15,7 @@ const createSchema = z.object({
   event_id: z.number().int().positive(), // O ID do evento é obrigatório e deve ser um número inteiro positivo
   value: z.number().nullable(), // O valor pode ser nulo ou um número
   quantity: z.number().int().positive(), // A quantidade é obrigatória e deve ser um número inteiro positivo
+  address: addressSchema
 });
 
 module.exports = createSchema;
