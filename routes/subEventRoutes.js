@@ -4,6 +4,9 @@ const SubEventController = require('../controllers/SubEventController');
 const createSchema = require('../validate/subEvent/createSchema');
 const updateSchema = require('../validate/subEvent/updateSchema');
 
+const AuthMiddleware = require('../middleware/AuthMiddleware.js');
+router.use(AuthMiddleware);
+
 // Middleware de validação para a rota de login
 function validateCreate(req, res, next) {
   try {
