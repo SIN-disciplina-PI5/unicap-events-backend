@@ -4,6 +4,9 @@ const UserController = require('../controllers/UserController');
 const createSchema = require('../validate/user/createSchema');
 const updateSchema = require('../validate/user/updateSchema');
 
+const AuthMiddleware = require('../middleware/AuthMiddleware.js');
+router.use(AuthMiddleware);
+
 // Middleware de validação para a rota de login
 function validateCreate(req, res, next) {
   try {
