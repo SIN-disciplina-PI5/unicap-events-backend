@@ -6,49 +6,74 @@ const db = knex(knexFile);
 exports.index = async (req, res) => {
   try {
     const subEvents = await db('sub_events')
-                            .join('events', 'sub_events.event_id', '=', 'events.id')
-                            .leftJoin('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
-                            .leftJoin('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
-                            .select(
-                              'sub_events.*', 
-                              'events.*', 
-                              'addresses.*', 
-                              'tickets.*'
-                            );
+      .join('events', 'sub_events.event_id', '=', 'events.id')
+      .join('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
+      .join('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
+      .select(
+        'sub_events.id as sub_event_id', 
+        'sub_events.name as sub_event_name', 
+        'sub_events.description as sub_event_description',
+        'sub_events.start_date as sub_event_start_date', 
+        'sub_events.end_date as sub_event_end_date', 
+        'sub_events.value as sub_event_value',
+        'sub_events.quantity as sub_event_quantity',
+        'sub_events.created_at as sub_event_created_at', 
+        'sub_events.updated_at as sub_event_updated_at',
+        'events.id as event_id',
+        'events.name as event_name',
+        'events.description as event_description',
+        'events.start_date as event_start_date',
+        'events.end_date as event_end_date',
+        'events.created_at as event_created_at',
+        'events.updated_at as event_updated_at',
+        'addresses.block',
+        'addresses.room',
+        'tickets.id as ticket_id',
+        'tickets.user_id',
+        'tickets.status',
+        'tickets.codigo_ingresso'
+      );
 
-    // Organizar os dados de forma aninhada
-    const nestedData = subEvents.map(subEvent => {
-      return {
-        id: subEvent.id,
-        name: subEvent.name,
-        description: subEvent.description,
-        start_date: subEvent.start_date,
-        end_date: subEvent.end_date,
-        value: subEvent.value,
-        quantity: subEvent.quantity,
-        created_at: subEvent.created_at,
-        updated_at: subEvent.updated_at,
-        event: {
-          id: subEvent.event_id,
-          name: subEvent.name,
-          description: subEvent.description,
-          start_date: subEvent.start_date,
-          end_date: subEvent.end_date,
-          created_at: subEvent.created_at,
-          updated_at: subEvent.updated_at
-        },
-        address: {
-          block: subEvent.block,
-          room: subEvent.room
-        },
-        tickets: {
-          status: subEvent.status,
-          codigo_ingresso: subEvent.codigo_ingresso
-        }
-      };
+    const subEventForId = {};
+
+    subEvents.forEach(subEvent => {
+      const id = subEvent.sub_event_id;
+      if (!subEventForId[id]) {
+        subEventForId[id] = {
+          id: subEvent.sub_event_id,
+          name: subEvent.sub_event_name,
+          description: subEvent.sub_event_description,
+          start_date: subEvent.sub_event_start_date,
+          end_date: subEvent.sub_event_end_date,
+          value: subEvent.sub_event_value,
+          quantity: subEvent.sub_event_quantity,
+          created_at: subEvent.sub_event_created_at,
+          updated_at: subEvent.sub_event_updated_at,
+          event: {
+            id: subEvent.event_id,
+            name: subEvent.event_name,
+            description: subEvent.event_description,
+            start_date: subEvent.event_start_date,
+            end_date: subEvent.event_end_date,
+            created_at: subEvent.event_created_at,
+            updated_at: subEvent.event_updated_at
+          },
+          address: {
+            block: subEvent.block,
+            room: subEvent.room
+          },
+          tickets: []
+        };
+      }
+      subEventForId[id].tickets.push({
+        id: subEvent.ticket_id,
+        user_id: subEvent.user_id,
+        status: subEvent.status,
+        codigo_ingresso: subEvent.codigo_ingresso
+      });
     });
 
-    res.json({ data: nestedData });
+    res.json({ data: Object.values(subEventForId) });
   } catch (error) {
     console.error('Erro ao obter os subeventos:', error);
     res.status(500).json({ error: 'Erro ao obter os subeventos' });
