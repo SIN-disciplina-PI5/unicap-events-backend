@@ -85,11 +85,76 @@ exports.show = async (req, res) => {
   const subEventId = req.params.id;
 
   try {
-    const subEvent = await db('sub_events').where({ id: subEventId }).first();
-    if (!subEvent) {
-      res.status(404).json({ error: 'Subevento não encontrado' });
+    const subEvents = await db('sub_events')
+      .leftJoin('events', 'sub_events.event_id', '=', 'events.id')
+      .leftJoin('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
+      .leftJoin('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
+      .select(
+        'sub_events.id as sub_event_id',
+        'sub_events.name as sub_event_name',
+        'sub_events.description as sub_event_description',
+        'sub_events.start_date as sub_event_start_date',
+        'sub_events.end_date as sub_event_end_date',
+        'sub_events.value as sub_event_value',
+        'sub_events.quantity as sub_event_quantity',
+        'sub_events.created_at as sub_event_created_at',
+        'sub_events.updated_at as sub_event_updated_at',
+        'events.id as event_id',
+        'events.name as event_name',
+        'events.description as event_description',
+        'events.start_date as event_start_date',
+        'events.end_date as event_end_date',
+        'events.created_at as event_created_at',
+        'events.updated_at as event_updated_at',
+        'addresses.block',
+        'addresses.room',
+        'tickets.id as ticket_id',
+        'tickets.user_id',
+        'tickets.status',
+        'tickets.codigo_ingresso'
+      )
+      .where('sub_events.id', subEventId);
+
+    if (subEvents.length === 0) {
+      return res.status(404).json({ error: 'Subevento não encontrado' });
     }
-    res.json({data: subEvent});
+
+    const subEventForId = {
+      id: subEvents[0].sub_event_id,
+      name: subEvents[0].sub_event_name,
+      description: subEvents[0].sub_event_description,
+      start_date: subEvents[0].sub_event_start_date,
+      end_date: subEvents[0].sub_event_end_date,
+      value: subEvents[0].sub_event_value,
+      quantity: subEvents[0].sub_event_quantity,
+      created_at: subEvents[0].sub_event_created_at,
+      updated_at: subEvents[0].sub_event_updated_at,
+      event: {
+        id: subEvents[0].event_id,
+        name: subEvents[0].event_name,
+        description: subEvents[0].event_description,
+        start_date: subEvents[0].event_start_date,
+        end_date: subEvents[0].event_end_date,
+        created_at: subEvents[0].event_created_at,
+        updated_at: subEvents[0].event_updated_at
+      },
+      address: {
+        block: subEvents[0].block,
+        room: subEvents[0].room
+      },
+      tickets: []
+    };
+
+    subEvents.forEach(subEvent => {
+      subEventForId.tickets.push({
+        id: subEvent.ticket_id,
+        user_id: subEvent.user_id,
+        status: subEvent.status,
+        codigo_ingresso: subEvent.codigo_ingresso
+      });
+    });
+
+    res.json({ data: subEventForId });
   } catch (error) {
     console.error('Erro ao obter o subevento:', error);
     res.status(500).json({ error: 'Erro ao obter o subevento' });
