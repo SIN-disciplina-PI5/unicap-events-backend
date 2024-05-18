@@ -5,8 +5,17 @@ const userTypeSchema = z.string().refine(value => {
   // Verifica se o valor está entre os três valores permitidos
   return ["Estudante", "Professor", "Participante"].includes(value);
 }, {
-  message: 'Tipo de usuário inválido. Deve ser "admin", "user" ou "guest".'
+  message: 'Tipo de usuário inválido. Deve ser "Estudante", "Professor" ou "Participante".'
 });
+
+// Definindo um esquema personalizado para validar o tipo de usuário
+const userPermissionSchema = z.string().refine(value => {
+  // Verifica se o valor está entre os três valores permitidos
+  return ["Super Admin", "Admin", "Participante"].includes(value);
+}, {
+  message: 'Tipo de usuário inválido. Deve ser "Super Admin", "Admin" ou "Participante".'
+});
+
 
 // Esquema de validação para os dados dos usuários
 const userSchema = z.object({
@@ -16,7 +25,7 @@ const userSchema = z.object({
   ra: z.string(), // RA é uma string opcional
   phone: z.string(), // O telefone é uma string opcional
   type: userTypeSchema, // O tipo de usuário é um número inteiro
-  permission: z.string(), // A permissão é uma string opcional
+  permission: userPermissionSchema, // A permissão é uma string opcional
 });
 
-module.exports = userSchema;
+module.exports = userSchema;
