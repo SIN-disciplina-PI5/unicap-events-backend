@@ -209,17 +209,14 @@ exports.destroy = async (req, res) => {
   const subEventId = req.params.id;
 
   try {
-    // Verificar se o subevento existe
     const existingSubEvent = await db('sub_events').where({ id: subEventId }).first();
     if (!existingSubEvent) {
       return res.status(404).json({ error: 'Subevento não encontrado' });
     }
 
-    // Excluir o subevento do banco de dados
     await db('sub_events').where({ id: subEventId }).del();
-
-    // Excluir o endereço do sub_event subevento do banco de dados
     await db('addresses').where({ sub_event_id: subEventId }).del();
+    await db('tickets').where({ sub_event_id: subEventId }).del();
 
     res.json({ message: 'Subevento excluído com sucesso' });
   } catch (error) {
