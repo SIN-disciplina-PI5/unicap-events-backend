@@ -25,10 +25,112 @@ O design da plataforma será cuidadosamente elaborado para refletir a identidade
 \section{Casos de uso}
 
 
-\chapter{Diagrama de Classes}
+\section{Diagrama de ER}
 
+Abaixo está o diagrama de Entidade/Relacionamentos que ilustra a estrutura e os relacionamentos entre as entidades do sistema:
 
-\section{Descrição do Diagrama}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{figuras/erdiagram.png}
+\caption{Diagrama de Entidades do Sistema}
+\label{fig:diagrama-entidades/relacionamentos}
+\end{figure}
 
+\begin{verbatim}
+erDiagram
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ TICKET : contains
+    USER ||--o{ CERTIFICATE : receives
+    CERTIFICATE }|--|| SUB_EVENT : "for"
+    USER ||--o{ SUBMISSION : makes
+    SUBMISSION }|--|| EVENT : "for"
+    SUBMISSION ||--o{ SUB_EVENT : "for"
+    EVENT ||--|{ SUB_EVENT : contains
+    SUB_EVENT ||--|| ADDRESS : has
+    USER ||--o{ ATTENDANCE : registers
+    ATTENDANCE }|--|| SUB_EVENT : "for"
 
-\section{Elementos do Diagrama}
+    USER {
+        int id
+        varchar name
+        varchar email
+        varchar ra
+        varchar phone
+        varchar type
+        varchar permission
+        bool isSuperAdmin
+    }
+
+    ORDER {
+        int id
+        int userId
+        int ticketIds
+        decimal totalValue
+        varchar paymentMethod
+        varchar statusPayment
+        datetime paymentAt
+        varchar code
+    }
+
+    TICKET {
+        int id
+        int orderId
+        int subEventId
+        varchar status
+        varchar codigoIngresso
+        datetime createdAt
+    }
+
+    CERTIFICATE {
+        int id
+        int userId
+        int subEventId
+        datetime createdAt
+        varchar verificationCode
+    }
+
+    SUBMISSION {
+        int id
+        int userId
+        int subEventId
+        varchar workTitle
+        text description
+        blob archive
+        datetime submissionDate
+        varchar status
+    }
+
+    EVENT {
+        int id
+        varchar name
+        text description
+        datetime startDate
+        datetime endDate
+    }
+
+    SUB_EVENT {
+        int id
+        varchar name
+        text description
+        datetime startDate
+        datetime endDate
+        int eventId
+        decimal value
+        int quantity
+    }
+
+    ADDRESS {
+        int id
+        int subEventId
+        varchar block
+        varchar floor
+    }
+
+    ATTENDANCE {
+        int id
+        int userId
+        int subEventId
+        datetime checkinTime
+        datetime checkoutTime
+    }
+\end{verbatim}
