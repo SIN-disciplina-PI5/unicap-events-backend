@@ -7,7 +7,6 @@ exports.up = function(knex) {
     table.datetime('end_date').notNullable();
     table.integer('event_id').unsigned().notNullable();
     table.foreign('event_id').references('id').inTable('events');
-    table.decimal('value').nullable();
     table.integer('quantity').notNullable();
     table.timestamps(true, true);
   });
