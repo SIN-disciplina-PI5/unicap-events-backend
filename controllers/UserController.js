@@ -1,6 +1,11 @@
 const knex = require('knex');
 const knexFile = require('../knexfile.js');
 const db = knex(knexFile);
+const { initializeApp } = require("@firebase/app");
+const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCustomToken, signOut } = require("firebase/auth");
+const firebaseJson = require('../firebaseCredentials.json');
+// Inicializa o módulo de autenti
+const auth = getAuth(initializeApp(firebaseJson));
 
 // Listar todos os usuários
 exports.index = async (req, res) => {
@@ -33,7 +38,7 @@ exports.show = async (req, res) => {
 // Criar um novo usuário
 exports.create = async (req, res) => {
   const userData = req.body;
-
+  delete userData.confirm_password;
   try {
      // Usando transação do Knex
     const trx = await db.transaction();
@@ -68,6 +73,8 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   const userId = req.params.id;
   const userData = req.body;
+
+  delete userData.confirm_password;
   try {
     const user = await db('users').where({ id: userId }).first();
     if (!user) {
