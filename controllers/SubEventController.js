@@ -11,14 +11,14 @@ exports.index = async (req, res) => {
       .join('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
       .leftJoin('users', 'tickets.user_id', '=', 'users.id') // Join com a tabela de usuários
       .select(
-        'sub_events.id as sub_event_id', 
-        'sub_events.name as sub_event_name', 
+        'sub_events.id as sub_event_id',
+        'sub_events.name as sub_event_name',
         'sub_events.description as sub_event_description',
-        'sub_events.start_date as sub_event_start_date', 
-        'sub_events.end_date as sub_event_end_date', 
+        'sub_events.start_date as sub_event_start_date',
+        'sub_events.end_date as sub_event_end_date',
         'sub_events.value as sub_event_value',
         'sub_events.quantity as sub_event_quantity',
-        'sub_events.created_at as sub_event_created_at', 
+        'sub_events.created_at as sub_event_created_at',
         'sub_events.updated_at as sub_event_updated_at',
         'events.id as event_id',
         'events.name as event_name',
@@ -185,10 +185,29 @@ exports.create = async (req, res) => {
 
   try {
     // Inserir o subevento no banco de dados
-    const subEventId = await db('sub_events').insert({ name, description, start_date, end_date, event_id, value, quantity });
-    
+    const subEventId = await db('sub_events').insert({ name, description, start_date, end_date, event_id, value, quantity }).returning('id');
+
+    address.sub_event_id = subEventId[0].id;
     // Inserir o endereço associado ao subevento
-    await db('sub_event_addresses').insert({ sub_event_id: subEventId[0], ...address });
+    await db('addresses').insert(address);
+
+    // Create an array to store ticket objects
+    const tickets = [];
+
+    // Loop through the quantity to generate tickets
+    for (let i = 0; i < quantity; i++) {
+
+      // Create a ticket object for each iteration
+      tickets.push({
+        user_id: null, // Set user_id to null initially (can be updated later)
+        sub_event_id: subEventId[0].id,
+        status: 'available', // Set status to 'available' by default
+        codigo_ingresso: crypto.randomUUID(),
+      });
+    }
+
+    await db('tickets').insert(tickets);
+
 
     res.status(201).json({ success: true, message: "Subevento criado com sucesso" });
   } catch (error) {
@@ -213,7 +232,7 @@ exports.update = async (req, res) => {
     await db('sub_events').where({ id: subEventId }).update({ name, description, start_date, end_date, event_id, value, quantity });
 
     // Atualizar o endereço associado ao subevento
-    await db('sub_event_addresses').where({ sub_event_id: subEventId }).update(address);
+    await db('addresses').where({ sub_event_id: subEventId }).update(address);
 
     res.status(201).json({ success: true, message: "Subevento atualizado com sucesso" });
   } catch (error) {
@@ -227,14 +246,17 @@ exports.destroy = async (req, res) => {
   const subEventId = req.params.id;
 
   try {
+    // Verificar se o subevento existe
     const existingSubEvent = await db('sub_events').where({ id: subEventId }).first();
     if (!existingSubEvent) {
       return res.status(404).json({ error: 'Subevento não encontrado' });
     }
 
+    // Excluir o subevento do banco de dados
     await db('sub_events').where({ id: subEventId }).del();
+
+    // Excluir o endereço do sub_event subevento do banco de dados
     await db('addresses').where({ sub_event_id: subEventId }).del();
-    await db('tickets').where({ sub_event_id: subEventId }).del();
 
     res.json({ message: 'Subevento excluído com sucesso' });
   } catch (error) {
