@@ -27,6 +27,5 @@ function validateRegister(req, res, next) {
 // Rotas
 router.post('/login', validateLogin, AuthController.login);
 router.post('/register', validateRegister, AuthController.register);
-// router.post('/logout', AuthController.logout);
 
-module.exports = router;
+module.exports = router;
