@@ -7,6 +7,7 @@ const AuthRoutes = require('./routes/authRoutes.js');
 const EventRoutes = require('./routes/eventRoutes.js');
 const SubEventRoutes = require('./routes/subEventRoutes.js');
 const UserRoutes = require('./routes/userRoutes.js');
+const AccreditationRoutes = require('./routes/accreditationRoutes.js');
 
 // inciar app
 const app = express();
@@ -18,6 +19,7 @@ app.use('/auth', AuthRoutes);
 app.use('/event', EventRoutes);
 app.use('/sub-event', SubEventRoutes);
 app.use('/user', UserRoutes);
+app.use('/accreditation', AccreditationRoutes);
 
 
 const PORT = 3000;

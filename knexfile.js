@@ -1,9 +1,12 @@
 module.exports = {
-    client: 'pg',
-    connection: {
-      host : 'kesavan.db.elephantsql.com',
-      user : 'aomdnyjh',
-      password : 'ijN0RpSFzR-V_ilaV8zjPT1sEo8DP180',
-      database : 'aomdnyjh'
+  client: 'pg',
+  connection: {
+    host : 'aws-0-us-west-1.pooler.supabase.com',
+    user : 'postgres.allmstfoxluyjswybkyb',
+    password : 'j9YkwB!wCN*bL49',
+    database : 'postgres',
+    ssl: {
+      rejectUnauthorized: false, // Adicione esta linha
     }
-  };
+  }
+};
