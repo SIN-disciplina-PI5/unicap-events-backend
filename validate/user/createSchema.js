@@ -11,7 +11,7 @@ const userTypeSchema = z.string().refine(value => {
 // Definindo um esquema personalizado para validar o tipo de usuário
 const userPermissionSchema = z.string().refine(value => {
   // Verifica se o valor está entre os três valores permitidos
-  return ["Super Admin", "Admin", "Participante"].includes(value);
+  return ["SuperAdmin", "Admin", "Participante"].includes(value);
 }, {
   message: 'Tipo de usuário inválido. Deve ser "Super Admin", "Admin" ou "Participante".'
 });
