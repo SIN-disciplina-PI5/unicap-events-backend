@@ -33,8 +33,28 @@ exports.show = async (req, res) => {
 // Criar um novo usuário
 exports.create = async (req, res) => {
   const userData = req.body;
+
   try {
+     // Usando transação do Knex
+    const trx = await db.transaction();
+
     await db('users').insert(userData);
+
+    var errorMessage = false;
+    // Se o e-mail não estiver em uso, cria o usuário
+    await createUserWithEmailAndPassword(auth, userData.email, userData.password)
+      .then((userCredential) => {
+        console.log('user criado');
+      })
+      .catch((error) => {
+        errorMessage = true;
+      });
+
+    if (errorMessage == true) {
+      return res.status(500).json({ error: "usuario já existe" });
+    }
+
+    await trx.commit();
 
     res.status(201).json({ success: true, message: "usuario criado com sucesso"});
 
@@ -75,6 +95,6 @@ exports.destroy = async (req, res) => {
     res.json({ message: 'Usuário excluído com sucesso' });
   } catch (error) {
     console.error('Erro ao excluir o usuário:', error);
-    res.status(500).json({ error: 'Erro ao excluir o usuário' });
-  }
+    res.status(500).json({ error: 'Erro ao excluir o usuário' });
+  }
 };
