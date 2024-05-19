@@ -2,11 +2,8 @@ const knex = require('knex');
 const knexFile = require('../knexfile.js');
 const db = knex(knexFile);
 const { initializeApp } = require("@firebase/app");
-const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCustomToken, signOut  } = require("firebase/auth");
+const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCustomToken, signOut } = require("firebase/auth");
 const firebaseJson = require('../firebaseCredentials.json');
-
-
-
 
 // Inicializa o módulo de autenti
 const auth = getAuth(initializeApp(firebaseJson));
@@ -33,61 +30,39 @@ exports.login = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  const { nome, email, password, password_confirmation, data_nascimento } = req.body;
+  const registerData = req.body;
 
-  if (!nome || !data_nascimento || !email || !password || !password_confirmation) {
-    return res.status(500).json({ error: "falta campos" });
-  }
-  
-  // Verifica se as senhas coincidem
-  if (password !== password_confirmation) {
-    return res.status(400).json({ error: "As senhas não coincidem" });
-  }
-  const senha = password;
+  registerData.type = "Participante";
+  registerData.permission = "Participante";
+  delete registerData.confirm_password;
 
-  var errorMessage = false;
-  // try {
+  try {
+    // Usando transação do Knex
+    const trx = await db.transaction();
 
+    await db('users').insert(registerData);
+
+    var errorMessage = false;
     // Se o e-mail não estiver em uso, cria o usuário
-    await createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log('user criado');
+    await createUserWithEmailAndPassword(auth, registerData.email, registerData.password)
+      .then((userCredential) => {
+        console.log('user criado');
+      })
+      .catch((error) => {
+        errorMessage = true;
+      });
 
-    })
-    .catch((error) => {
-      errorMessage = true;
-
-    });
-
-    if(errorMessage == true) {
+    if (errorMessage == true) {
       return res.status(500).json({ error: "usuario já existe" });
     }
-   
-    try {
-        await db('usuarios').insert({ nome, email, senha, data_nascimento });
-        
-        return res.status(201).json({ message: "Usuário registrado com sucesso"});
-    } catch{
-      return res.status(500).json({ error: "Erro ao registrar usuário" });
 
-    }
-    
+    await trx.commit();
 
-  // } catch (error) {
-  //   
+    return res.status(201).json({ message: "Usuário registrado com sucesso" });
 
-  // }
+  } catch {
+    return res.status(500).json({ error: "Erro ao registrar usuário" });
+
+  }
 
 };
-
-// exports.logout = async (req, res) => {
-//   const auth = getAuth();
-
-//   signOut(auth).then(() => {
-//     return res.status(201).json({ message: "Usuário deslogado com sucesso" });
-
-//   }).catch((error) => {
-//     return res.status(400).json({ error: "Não foi possivel deslogar o usuario" });
-
-//   });
-// };
