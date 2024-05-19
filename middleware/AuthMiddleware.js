@@ -1,5 +1,9 @@
 var admin = require("firebase-admin");
 var serviceAccount = require("../firebaseAdminCredentials.json");
+const knex = require('knex');
+const knexFile = require('../knexfile.js');
+const db = knex(knexFile);
+
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
@@ -13,7 +17,11 @@ const AuthMiddleware = async (req, res, next) => {
 
     try {
         const authUser = await admin.auth().verifyIdToken(token);
-        req.authUser = authUser;
+        const user = await db('users').where('email', authUser.email).first();
+        if(!user){
+            return res.sendStatus(401);
+        }
+        req.authUser = user;
         next();
 
     } catch (e) {
