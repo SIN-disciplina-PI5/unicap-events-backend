@@ -26,6 +26,9 @@ const userSchema = z.object({
   phone: z.string(), // O telefone é uma string opcional
   type: userTypeSchema, // O tipo de usuário é um número inteiro
   permission: userPermissionSchema, // A permissão é uma string opcional
-});
+}).refine(data => data.password === data.confirm_password, {
+  message: "Passwords must match",
+  path: ["confirm_password"], // Path to show the error
+});;
 
 module.exports = userSchema;
