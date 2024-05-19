@@ -9,6 +9,7 @@ exports.index = async (req, res) => {
       .join('events', 'sub_events.event_id', '=', 'events.id')
       .join('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
       .join('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
+      .leftJoin('users', 'tickets.user_id', '=', 'users.id') // Join com a tabela de usuários
       .select(
         'sub_events.id as sub_event_id', 
         'sub_events.name as sub_event_name', 
@@ -31,7 +32,10 @@ exports.index = async (req, res) => {
         'tickets.id as ticket_id',
         'tickets.user_id',
         'tickets.status',
-        'tickets.codigo_ingresso'
+        'tickets.codigo_ingresso',
+        'users.id as user_id', // Campos do usuário
+        'users.name as user_name',
+        'users.email as user_email'
       );
 
     const subEventForId = {};
@@ -69,7 +73,12 @@ exports.index = async (req, res) => {
         id: subEvent.ticket_id,
         user_id: subEvent.user_id,
         status: subEvent.status,
-        codigo_ingresso: subEvent.codigo_ingresso
+        codigo_ingresso: subEvent.codigo_ingresso,
+        user: subEvent.user_id ? { // Apenas adicionar os detalhes do usuário se o user_id não for nulo
+          id: subEvent.user_id,
+          name: subEvent.user_name,
+          email: subEvent.user_email
+        } : null
       });
     });
 
@@ -89,6 +98,7 @@ exports.show = async (req, res) => {
       .leftJoin('events', 'sub_events.event_id', '=', 'events.id')
       .leftJoin('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
       .leftJoin('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
+      .leftJoin('users', 'tickets.user_id', '=', 'users.id') // Join com a tabela de usuários
       .select(
         'sub_events.id as sub_event_id',
         'sub_events.name as sub_event_name',
@@ -111,7 +121,10 @@ exports.show = async (req, res) => {
         'tickets.id as ticket_id',
         'tickets.user_id',
         'tickets.status',
-        'tickets.codigo_ingresso'
+        'tickets.codigo_ingresso',
+        'users.id as user_id', // Campos do usuário
+        'users.name as user_name',
+        'users.email as user_email',
       )
       .where('sub_events.id', subEventId);
 
@@ -150,7 +163,12 @@ exports.show = async (req, res) => {
         id: subEvent.ticket_id,
         user_id: subEvent.user_id,
         status: subEvent.status,
-        codigo_ingresso: subEvent.codigo_ingresso
+        codigo_ingresso: subEvent.codigo_ingresso,
+        user: subEvent.user_id ? { // Apenas adicionar os detalhes do usuário se o user_id não for nulo
+          id: subEvent.user_id,
+          name: subEvent.user_name,
+          email: subEvent.user_email
+        } : null
       });
     });
 
