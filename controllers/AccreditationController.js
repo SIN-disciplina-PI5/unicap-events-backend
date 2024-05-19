@@ -67,7 +67,7 @@ exports.update = async (req, res) => {
 };
 
 async function generateAndSendCertificate(name, course, email, codigoIngresso) {
-  const certificatePath = certificado - ${name}.pdf;
+  const certificatePath = `certificado - ${name}.pdf`;
 
   // Cria o certificado
   createCertificate(name, course, codigoIngresso);

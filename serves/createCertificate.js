@@ -4,7 +4,7 @@ const fs = require('fs');
 function createCertificate(name, course, codigoIngresso) {
   const doc = new PDFDocument({ layout: 'landscape' });
 
-  doc.pipe(fs.createWriteStream(certificado - ${name}.pdf));
+  doc.pipe(fs.createWriteStream(`certificado - ${name}.pdf`));
 
   // Configurações de estilo
   doc.fontSize(28)
@@ -34,7 +34,7 @@ function createCertificate(name, course, codigoIngresso) {
   doc.moveDown(3)
     .fontSize(20)
     .font('Helvetica')
-    .text(UUID: ${codigoIngresso}   Data: ${new Date().toLocaleDateString('pt-BR')}, { align: 'center' });
+    .text(`UUID: ${codigoIngresso}   Data: ${new Date().toLocaleDateString('pt-BR')}, { align: 'center' }`);
 
   doc.end();
 }
