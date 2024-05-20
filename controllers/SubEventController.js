@@ -16,7 +16,6 @@ exports.index = async (req, res) => {
         'sub_events.description as sub_event_description',
         'sub_events.start_date as sub_event_start_date',
         'sub_events.end_date as sub_event_end_date',
-        'sub_events.value as sub_event_value',
         'sub_events.quantity as sub_event_quantity',
         'sub_events.created_at as sub_event_created_at',
         'sub_events.updated_at as sub_event_updated_at',
@@ -49,7 +48,6 @@ exports.index = async (req, res) => {
           description: subEvent.sub_event_description,
           start_date: subEvent.sub_event_start_date,
           end_date: subEvent.sub_event_end_date,
-          value: subEvent.sub_event_value,
           quantity: subEvent.sub_event_quantity,
           created_at: subEvent.sub_event_created_at,
           updated_at: subEvent.sub_event_updated_at,
@@ -105,7 +103,6 @@ exports.show = async (req, res) => {
         'sub_events.description as sub_event_description',
         'sub_events.start_date as sub_event_start_date',
         'sub_events.end_date as sub_event_end_date',
-        'sub_events.value as sub_event_value',
         'sub_events.quantity as sub_event_quantity',
         'sub_events.created_at as sub_event_created_at',
         'sub_events.updated_at as sub_event_updated_at',
@@ -138,7 +135,6 @@ exports.show = async (req, res) => {
       description: subEvents[0].sub_event_description,
       start_date: subEvents[0].sub_event_start_date,
       end_date: subEvents[0].sub_event_end_date,
-      value: subEvents[0].sub_event_value,
       quantity: subEvents[0].sub_event_quantity,
       created_at: subEvents[0].sub_event_created_at,
       updated_at: subEvents[0].sub_event_updated_at,
@@ -181,11 +177,11 @@ exports.show = async (req, res) => {
 
 // Criar um novo subevento
 exports.create = async (req, res) => {
-  const { name, description, start_date, end_date, event_id, value, quantity, address } = req.body;
+  const { name, description, start_date, end_date, event_id, quantity, address } = req.body;
 
   try {
     // Inserir o subevento no banco de dados
-    const subEventId = await db('sub_events').insert({ name, description, start_date, end_date, event_id, value, quantity }).returning('id');
+    const subEventId = await db('sub_events').insert({ name, description, start_date, end_date, event_id, quantity }).returning('id');
 
     address.sub_event_id = subEventId[0].id;
     // Inserir o endereço associado ao subevento
@@ -219,7 +215,7 @@ exports.create = async (req, res) => {
 // Atualizar um subevento existente por ID
 exports.update = async (req, res) => {
   const subEventId = req.params.id;
-  const { name, description, start_date, end_date, event_id, value, quantity, address } = req.body;
+  const { name, description, start_date, end_date, event_id, quantity, address } = req.body;
 
   try {
     // Verificar se o subevento existe
@@ -229,7 +225,7 @@ exports.update = async (req, res) => {
     }
 
     // Atualizar o subevento no banco de dados
-    await db('sub_events').where({ id: subEventId }).update({ name, description, start_date, end_date, event_id, value, quantity });
+    await db('sub_events').where({ id: subEventId }).update({ name, description, start_date, end_date, event_id, quantity });
 
     // Atualizar o endereço associado ao subevento
     await db('addresses').where({ sub_event_id: subEventId }).update(address);
