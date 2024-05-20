@@ -13,15 +13,25 @@ exports.login = async (req, res) => {
 
   try {
     // Autentica o usuário com o email e a senha
-    const user = await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+    const firebaseUser = await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
       // O usuário foi autenticado com sucesso
-      const user = userCredential.user;
-
-      return user;
+      const firebaseUser = userCredential.user;
+      
+      return firebaseUser;
 
     });
 
-    return res.status(200).json({ message: "Autenticação bem-sucedida", user });
+    const userDB = await db('users').where('email', firebaseUser.user.email).first();
+    if(!userDB){
+        return res.sendStatus(401);
+    }
+
+    const data = {
+      token: firebaseUser.user.stsTokenManager.accessToken,
+      permission: userDB.permission
+    }
+
+    return res.status(200).json({ message: "Autenticação bem-sucedida", data });
 
   } catch (error) {
     return res.status(401).json({ error: "Credenciais inválidas" });
