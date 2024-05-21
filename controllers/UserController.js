@@ -9,6 +9,9 @@ const auth = getAuth(initializeApp(firebaseJson));
 
 // Listar todos os usuários
 exports.index = async (req, res) => {
+  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
+	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+}
   try {
     const users = await db('users').select('*');
     res.json({data: users}, 200);
@@ -21,6 +24,9 @@ exports.index = async (req, res) => {
 
 // Obter um usuário específico por ID
 exports.show = async (req, res) => {
+if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
+	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+}
   const userId = req.params.id;
   try {
     const user = await db('users').where({ id: userId }).first();
@@ -37,6 +43,9 @@ exports.show = async (req, res) => {
 
 // Criar um novo usuário
 exports.create = async (req, res) => {
+  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
+	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+}
   const userData = req.body;
   delete userData.confirm_password;
   try {
@@ -71,6 +80,9 @@ exports.create = async (req, res) => {
 
 // Atualizar um usuário existente por ID
 exports.update = async (req, res) => {
+  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
+	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+}
   const userId = req.params.id;
   const userData = req.body;
 
@@ -91,17 +103,20 @@ exports.update = async (req, res) => {
 
 // Excluir um usuário existente por ID
 exports.destroy = async (req, res) => {
+  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
+	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+}
   const userId = req.params.id;
   try {
     const user = await db('users').where({ id: userId }).first();
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
-    
+
     await db('users').where({ id: userId }).del();
     res.json({ message: 'Usuário excluído com sucesso' });
   } catch (error) {
     console.error('Erro ao excluir o usuário:', error);
-    res.status(500).json({ error: 'Erro ao excluir o usuário' });
-  }
+    res.status(500).json({ error: 'Erro ao excluir o usuário' });
+  }
 };
