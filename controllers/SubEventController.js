@@ -4,12 +4,16 @@ const db = knex(knexFile);
 
 // Listar todos os subeventos
 exports.index = async (req, res) => {
+  console.log(req.authUser)
+  if(!['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)){
+    return res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteúdo!'});
+  }
   try {
     const subEvents = await db('sub_events')
       .join('events', 'sub_events.event_id', '=', 'events.id')
       .join('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
       .join('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
-      .leftJoin('users', 'tickets.user_id', '=', 'users.id') // Join com a tabela de usuários
+      .leftJoin('users', 'tickets.user_id', '=', 'users.id')
       .select(
         'sub_events.id as sub_event_id',
         'sub_events.name as sub_event_name',
@@ -32,7 +36,7 @@ exports.index = async (req, res) => {
         'tickets.user_id',
         'tickets.status',
         'tickets.codigo_ingresso',
-        'users.id as user_id', // Campos do usuário
+        'users.id as user_id',
         'users.name as user_name',
         'users.email as user_email'
       );
@@ -67,18 +71,26 @@ exports.index = async (req, res) => {
           tickets: []
         };
       }
-      subEventForId[id].tickets.push({
-        id: subEvent.ticket_id,
-        user_id: subEvent.user_id,
-        status: subEvent.status,
-        codigo_ingresso: subEvent.codigo_ingresso,
-        user: subEvent.user_id ? { // Apenas adicionar os detalhes do usuário se o user_id não for nulo
-          id: subEvent.user_id,
-          name: subEvent.user_name,
-          email: subEvent.user_email
-        } : null
-      });
+      if (['SuperAdmin', 'Admin'].includes(req.authUser.permission)) {
+        subEventForId[id].tickets.push({
+          id: subEvent.ticket_id,
+          user_id: subEvent.user_id,
+          status: subEvent.status,
+          codigo_ingresso: subEvent.codigo_ingresso,
+          user: subEvent.user_id ? {
+            id: subEvent.user_id,
+            name: subEvent.user_name,
+            email: subEvent.user_email
+          } : null
+        });
+      }
     });
+
+    if (!['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)) {
+      Object.values(subEventForId).forEach(subEvent => {
+        subEvent.tickets = subEvent.tickets.length;
+      });
+    }
 
     res.json({ data: Object.values(subEventForId) });
   } catch (error) {
@@ -90,13 +102,15 @@ exports.index = async (req, res) => {
 // Obter um subevento específico por ID
 exports.show = async (req, res) => {
   const subEventId = req.params.id;
-
+  if(!['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)){
+    return res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteúdo!'});
+  }
   try {
     const subEvents = await db('sub_events')
       .leftJoin('events', 'sub_events.event_id', '=', 'events.id')
       .leftJoin('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
       .leftJoin('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
-      .leftJoin('users', 'tickets.user_id', '=', 'users.id') // Join com a tabela de usuários
+      .leftJoin('users', 'tickets.user_id', '=', 'users.id')
       .select(
         'sub_events.id as sub_event_id',
         'sub_events.name as sub_event_name',
@@ -119,7 +133,7 @@ exports.show = async (req, res) => {
         'tickets.user_id',
         'tickets.status',
         'tickets.codigo_ingresso',
-        'users.id as user_id', // Campos do usuário
+        'users.id as user_id',
         'users.name as user_name',
         'users.email as user_email',
       )
@@ -155,18 +169,24 @@ exports.show = async (req, res) => {
     };
 
     subEvents.forEach(subEvent => {
-      subEventForId.tickets.push({
-        id: subEvent.ticket_id,
-        user_id: subEvent.user_id,
-        status: subEvent.status,
-        codigo_ingresso: subEvent.codigo_ingresso,
-        user: subEvent.user_id ? { // Apenas adicionar os detalhes do usuário se o user_id não for nulo
-          id: subEvent.user_id,
-          name: subEvent.user_name,
-          email: subEvent.user_email
-        } : null
-      });
+      if (['SuperAdmin', 'Admin'].includes(req.authUser.permission)) {
+        subEventForId.tickets.push({
+          id: subEvent.ticket_id,
+          user_id: subEvent.user_id,
+          status: subEvent.status,
+          codigo_ingresso: subEvent.codigo_ingresso,
+          user: subEvent.user_id ? {
+            id: subEvent.user_id,
+            name: subEvent.user_name,
+            email: subEvent.user_email
+          } : null
+        });
+      }
     });
+
+    if (['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)) {
+      subEventForId.tickets = subEventForId.tickets.length;
+    }
 
     res.json({ data: subEventForId });
   } catch (error) {
@@ -175,8 +195,12 @@ exports.show = async (req, res) => {
   }
 };
 
+
 // Criar um novo subevento
 exports.create = async (req, res) => {
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const { name, description, start_date, end_date, event_id, quantity, address } = req.body;
 
   try {
@@ -214,6 +238,9 @@ exports.create = async (req, res) => {
 
 // Atualizar um subevento existente por ID
 exports.update = async (req, res) => {
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const subEventId = req.params.id;
   const { name, description, start_date, end_date, event_id, quantity, address } = req.body;
 
@@ -240,6 +267,9 @@ exports.update = async (req, res) => {
 // Excluir um subevento existente por ID
 exports.destroy = async (req, res) => {
   const subEventId = req.params.id;
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
 
   try {
     // Verificar se o subevento existe

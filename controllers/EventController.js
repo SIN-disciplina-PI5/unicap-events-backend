@@ -4,9 +4,9 @@ const db = knex(knexFile);
 
 // Listar todos os eventos
 exports.index = async (req, res) => {
-  if(!['SuperAdmin', 'Admin', 'Participante'].includes(authUser.permission)){
-	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
-}
+  if(!['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   try {
     const events = await db('events').select('*');
     res.json(events);
@@ -19,9 +19,9 @@ exports.index = async (req, res) => {
 
 // Obter um evento específico por ID
 exports.show = async (req, res) => {
-  if(!['SuperAdmin', 'Admin', 'Participante'].includes(authUser.permission)){
-	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
-}
+  if(!['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const eventId = req.params.id;
   try {
 
@@ -39,9 +39,9 @@ exports.show = async (req, res) => {
 
 // Criar um novo evento
 exports.create = async (req, res) => {
-if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
-	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
-}
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const eventData = req.body;
   try {
 
@@ -59,9 +59,9 @@ if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
 
 // Atualizar um evento existente por ID
 exports.update = async (req, res) => {
-  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
-	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
-}
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const eventId = req.params.id;
   const eventData = req.body;
   try {
@@ -82,9 +82,9 @@ exports.update = async (req, res) => {
 
 // Excluir um evento existente por ID
 exports.destroy = async (req, res) => {
-  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
-	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
-}
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const eventId = req.params.id;
   try {
     // Verificar se o evento existe

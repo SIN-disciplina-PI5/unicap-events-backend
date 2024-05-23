@@ -8,9 +8,9 @@ const fs = require('fs');
 
 // Obter um ticket específico por ID
 exports.show = async (req, res) => {
-  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
-	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
-}
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const codigoIngresso = req.params.id;
   try {
     const codigo = await db('tickets').where('codigo_ingresso', codigoIngresso ).where('status', 'aprovado').first();
@@ -28,9 +28,9 @@ exports.show = async (req, res) => {
 
 // Atualizar um evento existente por ID
 exports.update = async (req, res) => {
-  if(!['SuperAdmin', 'Admin'].includes(authUser.permission)){
-	res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
-}
+  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
+    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  }
   const codigo_ingresso = req.params.id;
 
   try {
