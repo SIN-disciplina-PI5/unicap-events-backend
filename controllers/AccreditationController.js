@@ -28,9 +28,10 @@ exports.show = async (req, res) => {
 
 // Atualizar um evento existente por ID
 exports.update = async (req, res) => {
-  if(!['SuperAdmin', 'Admin'].includes(req.authUser.permission)){
-    res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteudo!'});
+  if (!['SuperAdmin', 'Admin'].includes(req.authUser.permission)) {
+    return res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteúdo!' });
   }
+
   const codigo_ingresso = req.params.id;
 
   try {
@@ -42,9 +43,9 @@ exports.update = async (req, res) => {
       .where('status', 'reservado')
       .whereNotNull('tickets.user_id')
       .select(
-        'tickets.*', 
-        'users.name as user_name', 
-        'users.email as user_email', 
+        'tickets.*',
+        'users.name as user_name',
+        'users.email as user_email',
         'sub_events.name as sub_event_name'
       )
       .first();
