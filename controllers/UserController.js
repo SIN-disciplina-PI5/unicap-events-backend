@@ -120,3 +120,44 @@ exports.destroy = async (req, res) => {
     res.status(500).json({ error: 'Erro ao excluir o usuário' });
   }
 };
+
+exports.subscribe = async (req, res) => {
+  try {
+    const subEventId = req.params.id;
+
+    // Inicia uma transação
+    const trx = await db.transaction();
+    const userId = req.authUser.id;
+
+    // Seleciona um ticket disponível de forma aleatória
+    const ticket = await trx('tickets')
+      .where('sub_event_id', subEventId)
+      .where('status', 'disponivel')
+      .orderByRaw('RANDOM()') // Para PostgreSQL use 'RANDOM()' em vez de 'RAND()'
+      .first();
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Nenhum ticket disponível encontrado' });
+    }
+
+    // Atualiza o ticket selecionado para associar ao usuário
+    await trx('tickets')
+      .where('id', ticket.id)
+      .update({
+        user_id: userId,
+        status: 'reservado'
+      });
+
+    // Confirma a transação
+    await trx.commit();
+
+    res.json({
+       message: 'Inscrição feita com sucesso',
+       codigo_ingresso: ticket.codigo_ingresso
+      }); 
+
+  } catch (error) {
+    console.error('Erro ao associar ticket:', error);
+
+  }
+}

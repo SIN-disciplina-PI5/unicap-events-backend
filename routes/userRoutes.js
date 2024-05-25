@@ -32,5 +32,6 @@ router.get('/:id', UserController.show);
 router.post('/', validateCreate, UserController.create);
 router.put('/:id', validateUpdate, UserController.update);
 router.delete('/:id', UserController.destroy);
+router.put('/subscribe/:id', UserController.subscribe);
 
 module.exports = router;
