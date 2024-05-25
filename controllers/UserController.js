@@ -124,45 +124,59 @@ exports.destroy = async (req, res) => {
 exports.subscribe = async (req, res) => {
   try {
     const subEventId = req.params.id;
+    const userId = req.authUser.id;
 
     // Inicia uma transação
     const trx = await db.transaction();
-    const userId = req.authUser.id;
 
-    const user = await trx('user').where('sub_event_id', subEventId).where('user_id', userId).first();
-    if(user){
-      return res.status(404).json({ error: 'Usuario já inscrito no evento' });
-    }
-    
-    // Seleciona um ticket disponível de forma aleatória
-    const ticket = await trx('tickets')
-      .where('sub_event_id', subEventId)
-      .where('status', 'disponivel')
-      .orderByRaw('RANDOM()') // Para PostgreSQL use 'RANDOM()' em vez de 'RAND()'
-      .first();
+    try {
+      // Verifica se o usuário já está inscrito no sub-evento
+      const user = await trx('tickets')
+        .where('sub_event_id', subEventId)
+        .where('user_id', userId)
+        .first();
 
-    if (!ticket) {
-      return res.status(404).json({ error: 'Nenhum ticket disponível encontrado' });
-    }
+      console.log(user)
+      if (user) {
+        await trx.rollback();
+        return res.status(400).json({ error: 'Usuário já inscrito no evento' });
+      }
 
-    // Atualiza o ticket selecionado para associar ao usuário
-    await trx('tickets')
-      .where('id', ticket.id)
-      .update({
-        user_id: userId,
-        status: 'reservado'
+      // Seleciona um ticket disponível de forma aleatória
+      const ticket = await trx('tickets')
+        .where('sub_event_id', subEventId)
+        .where('status', 'disponivel')
+        .orderByRaw('RANDOM()') // Para PostgreSQL use 'RANDOM()' em vez de 'RAND()'
+        .first();
+
+      if (!ticket) {
+        await trx.rollback();
+        return res.status(404).json({ error: 'Nenhum ticket disponível encontrado' });
+      }
+
+      // Atualiza o ticket selecionado para associar ao usuário
+      await trx('tickets')
+        .where('id', ticket.id)
+        .update({
+          user_id: userId,
+          status: 'reservado'
+        });
+
+      // Confirma a transação
+      await trx.commit();
+
+      res.json({
+        message: 'Inscrição feita com sucesso',
+        codigo_ingresso: ticket.codigo_ingresso
       });
-
-    // Confirma a transação
-    await trx.commit();
-
-    res.json({
-       message: 'Inscrição feita com sucesso',
-       codigo_ingresso: ticket.codigo_ingresso
-      }); 
-
+    } catch (error) {
+      // Se houver qualquer erro, reverte a transação
+      await trx.rollback();
+      console.error('Erro ao associar ticket:', error);
+      return res.status(500).json({ error: 'Erro ao associar ticket' });
+    }
   } catch (error) {
-    console.error('Erro ao associar ticket:', error);
-
+    console.error('Erro ao iniciar transação:', error);
+    return res.status(500).json({ error: 'Erro ao iniciar transação' });
   }
-}
+};
