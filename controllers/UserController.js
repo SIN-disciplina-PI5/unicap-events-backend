@@ -179,3 +179,29 @@ exports.subscribe = async (req, res) => {
     return res.status(500).json({ error: 'Erro ao iniciar transação' });
   }
 };
+
+exports.mySubscribe = async (req, res) => {
+  const userId = req.authUser.id;
+  try {
+    // Consulta ao banco de dados para recuperar as inscrições do usuário
+    const registrations = await db('tickets')
+    .where('user_id', userId)
+    .join('sub_events', 'tickets.sub_event_id', '=', 'sub_events.id')
+    .select(
+      'sub_events.id as sub_event_id',
+      'sub_events.name as sub_event_name',
+      'sub_events.description as sub_event_description',
+      'sub_events.start_date as sub_event_start_date',
+      'sub_events.end_date as sub_event_end_date',
+      'tickets.status',
+      'tickets.codigo_ingresso'
+    );
+
+    res.json({
+      data: registrations
+    });
+  } catch (error) {
+    console.error('Erro ao listar as inscrições em subeventos:', error);
+    throw error;
+  }
+}

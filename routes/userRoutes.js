@@ -28,6 +28,7 @@ function validateUpdate(req, res, next) {
 }
 
 router.get('/', UserController.index);
+router.get('/my-subscribe', UserController.mySubscribe);
 router.get('/:id', UserController.show);
 router.post('/', validateCreate, UserController.create);
 router.put('/:id', validateUpdate, UserController.update);
