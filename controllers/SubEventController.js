@@ -4,13 +4,21 @@ const db = knex(knexFile);
 
 // Listar todos os subeventos
 exports.index = async (req, res) => {
-  console.log(req.authUser)
   if(!['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)){
     return res.status(403).json({ success: false, message: 'Você não tem autorização para acessar esse conteúdo!'});
   }
+
+  const { event_id } = req.query;
+
   try {
     const subEvents = await db('sub_events')
-      .join('events', 'sub_events.event_id', '=', 'events.id')
+      // .join('events', 'sub_events.event_id', '=', 'events.id')
+      .join('events', function() {
+        this.on('sub_events.event_id', '=', 'events.id');
+        if (event_id) {
+          this.andOn('events.id', '=', db.raw('?', [event_id]));
+        }
+      })
       .join('addresses', 'sub_events.id', '=', 'addresses.sub_event_id')
       .join('tickets', 'sub_events.id', '=', 'tickets.sub_event_id')
       .leftJoin('users', 'tickets.user_id', '=', 'users.id')
@@ -40,6 +48,8 @@ exports.index = async (req, res) => {
         'users.name as user_name',
         'users.email as user_email'
       );
+
+    // const subEvents = await subEventsQuery;
 
     const subEventForId = {};
 
@@ -86,11 +96,9 @@ exports.index = async (req, res) => {
       }
     });
 
-    if (!['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)) {
-      Object.values(subEventForId).forEach(subEvent => {
-        subEvent.tickets = subEvent.tickets.length;
-      });
-    }
+    Object.values(subEventForId).forEach(subEvent => {
+      subEvent.tickets_available = subEvent.tickets.filter(ticket => ticket.status === 'disponivel').length;
+    });
 
     res.json({ data: Object.values(subEventForId) });
   } catch (error) {
@@ -183,10 +191,9 @@ exports.show = async (req, res) => {
         });
       }
     });
+    
+    subEventForId.tickets_available = subEventForId.tickets.filter(ticket => ticket.status === 'disponivel').length;
 
-    if (['SuperAdmin', 'Admin', 'Participante'].includes(req.authUser.permission)) {
-      subEventForId.tickets = subEventForId.tickets.length;
-    }
 
     res.json({ data: subEventForId });
   } catch (error) {
@@ -221,7 +228,7 @@ exports.create = async (req, res) => {
       tickets.push({
         user_id: null, // Set user_id to null initially (can be updated later)
         sub_event_id: subEventId[0].id,
-        status: 'available', // Set status to 'available' by default
+        status: 'disponivel', // Set status to 'available' by default
         codigo_ingresso: crypto.randomUUID(),
       });
     }

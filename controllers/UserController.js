@@ -129,6 +129,11 @@ exports.subscribe = async (req, res) => {
     const trx = await db.transaction();
     const userId = req.authUser.id;
 
+    const user = await trx('user').where('sub_event_id', subEventId).where('user_id', userId).first();
+    if(user){
+      return res.status(404).json({ error: 'Usuario já inscrito no evento' });
+    }
+    
     // Seleciona um ticket disponível de forma aleatória
     const ticket = await trx('tickets')
       .where('sub_event_id', subEventId)
