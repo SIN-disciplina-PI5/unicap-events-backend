@@ -5,6 +5,7 @@ const db = knex(knexFile);
 const createCertificate = require('../service/createCertificate');
 const sendEmail = require('../service/sendEmail');
 const fs = require('fs');
+const path = require('path');
 
 // Obter um ticket específico por ID
 exports.show = async (req, res) => {
@@ -37,11 +38,11 @@ exports.update = async (req, res) => {
   try {
     // Verificar se o ticket existe e se está atribuído a algum usuário
     const ticket = await db('tickets')
-      .join('users', 'tickets.user_id', '=', 'users.id')
-      .join('sub_events', 'tickets.sub_event_id', '=', 'sub_events.id')
-      .where('tickets.codigo_ingresso', codigo_ingresso)
+      .where('codigo_ingresso', codigo_ingresso)
       .where('status', 'reservado')
       .whereNotNull('tickets.user_id')
+      .join('users', 'tickets.user_id', '=', 'users.id')
+      .join('sub_events', 'tickets.sub_event_id', '=', 'sub_events.id')
       .select(
         'tickets.*',
         'users.name as user_name',
@@ -74,17 +75,32 @@ exports.update = async (req, res) => {
 };
 
 async function generateAndSendCertificate(name, course, email, codigoIngresso) {
-  const certificatePath = `certificado - ${name}.pdf`;
+  const fileName = `certificado_${name}.pdf`;
+  const filePath = path.join('/tmp', fileName);
 
-  // Cria o certificado
-  createCertificate(name, course, codigoIngresso);
+  try {
 
-  // Espera a criação do arquivo
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Ajuste conforme necessário
+    // Cria o certificado
+    await createCertificate(name, course, codigoIngresso, filePath);
 
-  // Envia o email com o certificado
-  await sendEmail(email, 'Seu Certificado do Curso', 'Essa é sua certificação! Parabéns!', certificatePath);
+    // Verifica se o arquivo foi criado com sucesso
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Certificado não foi gerado: ${filePath}`);
+    }
 
-  // Remove o arquivo após envio
-  fs.unlinkSync(certificatePath);
+    // Envia o email com o certificado
+    await sendEmail(email, 'Seu Certificado do Curso', 'Essa é sua certificação! Parabéns!', filePath);
+
+    console.log('Certificate sent successfully!');
+
+  } catch (err) {
+    console.error('Error generating or sending certificate:', err);
+    throw err; // Relança o erro para ser tratado no bloco catch do chamador
+
+  } finally {
+    // Remove o arquivo após envio
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  }
 }

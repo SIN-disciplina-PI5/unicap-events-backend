@@ -136,7 +136,6 @@ exports.subscribe = async (req, res) => {
         .where('user_id', userId)
         .first();
 
-      console.log(user)
       if (user) {
         await trx.rollback();
         return res.status(400).json({ error: 'Usuário já inscrito no evento' });

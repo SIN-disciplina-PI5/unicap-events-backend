@@ -17,7 +17,7 @@ async function sendEmail(to, subject, text, attachmentPath) {
     text: text, // Texto do email
     attachments: [
       {
-        filename: attachmentPath.toString(),
+        filename: (attachmentPath.toString()).replace('/tmp/', ''),
         path: attachmentPath
       }
     ]
