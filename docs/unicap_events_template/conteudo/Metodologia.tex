@@ -1,39 +1,290 @@
 \chapter{Metodologia}
 
-
 \section{Descrição Geral}
 
-O projeto consiste na concepção e implementação de uma nova plataforma de eventos para o Instituto Humanitas da Universidade, com o objetivo de modernizar e aprimorar significativamente o sistema atual. A plataforma será um ponto central para a divulgação e gerenciamento de eventos acadêmicos, culturais e científicos promovidos pelo instituto, proporcionando uma experiência mais intuitiva, atrativa e eficiente para toda a comunidade universitária.
+O projeto consiste na concepção e implementação de uma nova plataforma de eventos para o Instituto Humanitas da Universidade Católica de Pernambuco, com o objetivo de modernizar e aprimorar significativamente o sistema atual. A plataforma será um ponto central para a divulgação e gerenciamento de eventos acadêmicos, culturais e científicos promovidos pelo instituto, proporcionando uma experiência mais intuitiva, atrativa e eficiente para toda a comunidade universitária.
 
-O design da plataforma será cuidadosamente elaborado para refletir a identidade visual do Instituto Humanitas, garantindo uma interface moderna, limpa e atraente. Além disso, serão integrados recursos interativos, como calendário, notificações automáticas e estatísticas, para aumentar o engajamento e a participação da comunidade nos eventos.
-
+O design da plataforma será cuidadosamente elaborado para refletir a identidade visual do Instituto Humanitas, garantindo uma interface moderna, limpa e atraente. Além disso, serão integrados novos recursos, como um sistema de inscrição online, criação de sub-eventos, notificações, credenciamento de participantes e emissão de certificados pós-evento, para aumentar o engajamento e a participação da comunidade nos eventos. Estes recursos permitirão uma maior interação e envolvimento dos participantes, facilitando a organização e promovendo uma maior visibilidade dos eventos.
 
 \section{Especificações Técnicas}
 
-\subsection{Banco de Dados}
-
-
 \subsection{Front-End}
 
+Para o Fron-End da Unicap Events, utilizamos uma série de tecnologias modernas para construir um frontend dinâmico e responsivo. A aplicação é construída principalmente com React e Next.js, proporcionando uma arquitetura robusta e eficiente para o desenvolvimento de aplicações web. \\
+
+Componentes e Ferramentas Utilizadas: 
+
+\begin{itemize}
+
+\item Utilizamos React para a construção dos componentes da interface de usuário, garantindo uma experiência de usuário fluida e interativa.
+
+\item O Next.js foi escolhido como o framework principal, proporcionando suporte para renderização do lado do servidor (SSR) e geração de sites estáticos (SSG), o que melhora significativamente a performance e SEO da aplicação.
+
+\item Para a estilização e componentes de interface, utilizamos o Chakra UI, que oferece uma biblioteca de componentes React acessíveis e personalizáveis. Isso facilitou a criação de uma interface de usuário consistente e responsiva.
+
+\item O gerenciamento de estados foi feito utilizando hooks do React, como 'useState' e 'useEffect'. Como exemplo, no componente 'Acreditation', utilizamos o 'useEffect' para buscar eventos da API ao carregar a página, garantindo que a lista de eventos esteja sempre atualizada.
+
+\item Para a comunicação com a API, utilizamos o Axios para realizar requisições HTTP, buscar dados dos usuários autenticados e exibi-los em uma tabela.
+
+\item A autenticação dos usuários foi gerenciada utilizando tokens armazenados no localStorage. Verificações são feitas para garantir que o token não está expirado antes de permitir o acesso a certas rotas.
+
+\item Implementação de renderização condicional com base nas permissões do usuário e na rota atual, garantindo que apenas usuários autorizados possam acessar determinadas partes da aplicação.
+
+\item Para a estilização utilizamos os arquivos CSS e variáveis CSS customizadas para definir temas e estilos globais da aplicação. O arquivo de estilos globais define cores, fontes e outros estilos padrão para a aplicação, garantindo uma aparência coesa.
+
+\item Utilizamos também o 'useToast' do Chakra UI para fornecer feedback visual aos usuários, como notificações de sucesso ou erro. Como exemplo no componente 'ModalCreateEvents', uma notificação de sucesso é exibida quando um evento é criado com sucesso.
+
+\item De bibliotecas também utilizamos o Date-fns, uma biblioteca para manipulação e formatação de datas em JavaScript, conhecida por sua performance e simplicidade em comparação com outras bibliotecas de data, e o Dotenv que carrega variáveis de ambiente de um arquivo .env para process.env em Node.js, facilitando a configuração e a gestão de variáveis sensíveis e de ambiente. 
+
+\item Utilizamos outras como o 'framer-motion', biblioteca de animações para React que permite criar animações complexas e interações fluidas, melhorando a experiência do usuário e a biblioteca de progresso 'nprogress' para mostrar uma barra de progresso na parte superior da página durante o carregamento, melhorando a percepção de performance para o usuário.
+
+\item Escolhemos a Vercel para hospedar o Front-End do nosso projeto por sua confiabilidade, desempenho e facilidade de uso. Ela oferece implantação rápida, dimensionamento automático e uma rede global que garante carregamentos rápidos. A interface intuitiva e a boa documentação também foram fatores decisivos, facilitando a configuração e o gerenciamento da hospedagem.
+
+
+\end{figure}
 
 \subsection{Back-End}
 
+Para a parte do Back-end, as ferramentas e metodologias escolhidas a seguir foram integradas para criar uma plataforma escalável e segura, capaz de atender a todas as demandas. Desde a autenticação de usuários até a geração dinâmica de certificados, cada aspecto foi planejado e implementado para garantir uma experiência fluida e segura para os organizadores e participantes.
+
+\begin{itemize}
+
+\item Utilizamos o Node.js como runtime para o servidor, devido à sua alta performance e capacidade de lidar com operações assíncronas. O Express.js é o framework escolhido para facilitar a criação das rotas e gerenciar as requisições HTTP de forma mais simplificada.
+
+\item Para o Middleware e configurações usamos o body-parser: para tratar os corpos das requisições, especialmente em formato JSON, o body-parser foi utilizado, e cors: para permitir requisições de diferentes origens, configuramos o CORS (Cross-Origin Resource Sharing).
+
+\item Implementamos várias rotas para diferentes funcionalidades:
+
+    AuthRoutes: Para autenticação de usuários.\\
+    EventRoutes: Para operações relacionadas aos eventos principais.\\
+    SubEventRoutes: Para gerenciamento de subeventos.\\
+    UserRoutes: Para operações de gerenciamento de usuários.\\
+    AccreditationRoutes: Para a acreditação de participantes e emissão de certificados.
+
+\item Utilizamos o PostgreSQL como banco de dados relacional, acessado através do Knex.js, que é um query builder SQL flexível e poderoso. Definimos e gerenciamos as migrações do banco de dados para manter a estrutura de tabelas atualizada, conforme necessário.
+
+\item Para autenticação, integramos o Firebase Authentication. Configuramos um middleware de autenticação que verifica os tokens JWT emitidos pelo Firebase e autentica os usuários no sistema.
+
+\item Utilizamos a biblioteca Zod para validar os dados dos usuários, garantindo que os dados recebidos no backend estejam corretos e no formato esperado.
+
+\item Para a geração de certificados em PDF, utilizamos a biblioteca PDFKit. Esta permite criar documentos PDF de forma programática.
+
+\item Para enviar os certificados por email, utilizamos a biblioteca Nodemailer. Esta facilita a configuração de serviços de email e o envio de mensagens automatizadas.
+
+\end{itemize}
 
 \section{Descrição de Interfaces}
 
+A plataforma de eventos Unicap Events, desenvolvida para o Instituto Humanitas da Universidade Católica de Pernambuco, conta com telas muito bem projetadas, entre as quais se destacam:
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=.6\linewidth]{Figuras/nomeImg.png}
+%     \caption{Interface - Página principal.}
+%     \label{fig:home}
+% \end{figure} 
+
+\begin{itemize}
+
+ \item A tela de login é a porta de entrada para a plataforma de eventos. Nela, os usuários encontram um campo para inserir o endereço de e-mail e outro para a senha. Além disso, há botões para "Entrar" e "Cadastrar-se", permitindo que novos usuários se cadastrem facilmente. O design é minimalista, focando na simplicidade e clareza para garantir que os usuários possam acessar rapidamente a plataforma.
+
+ \begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figuras/telaLogin.png}
+    \subsection{{Tela de Login}}
+    \label{fig:telaLogin}
+\end{figure}
+
+ \item Após o login, os usuários são direcionados para a tela principal da plataforma, que possui um menu lateral à esquerda. Esse menu lateral exibe para a área do Administrador opções como "Participantes", "Eventos", "Usuários", e "Credenciamento", e para a área do Paricipante as opções de "Eventos Disponiveis" e "Minhas Inscrições". No side bar da tela inicial, há o logotipo da plataforma e, no rodapé do menu lateral, um botão para logout. O restante da tela é dinâmico, mostrando o conteúdo correspondente à opção selecionada no menu.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figuras/telaInicial.png}
+    \subsection{{Menu Lateral - Home (Super Admin)}}
+    \label{fig:telaInicial}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figuras/criarEvento.png}
+    \subsection{{Criando novo Evento}}
+    \label{fig:criarEvento}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figuras/subEvento.jpeg}
+    \subsection{{Criando Sub Evento}}
+    \label{fig:subEvento}
+\end{figure}
+
+\item Na seção de gerenciamento de eventos para Administradores, há a opção de visualizar, criar, editar e excluir eventos. A tela apresenta uma lista de eventos existentes com informações básicas como nome, data, e local. Acima dessa lista, há um botão de "Adicionar Evento" com essas opções. Ao clicar em um evento existente ou no botão para adicionar um novo evento, uma nova tela se abre, permitindo a edição detalhada do evento e a opção de adcionar Sub-eventos a esse evento principal. Na opção de Criar ou Editar Sub-eventos, podemos preencher com nome, descrição, data/horário, local e quantidade de ingressos disponíveis.
+
+\item No gerenciamento de Participantes, além da exibição de todos os usuários, a tela oferece botões de ação que possibilitam a realização de tarefas comuns de gerenciamento, como o botão destacado para "Adicionar Usuário", que, ao ser clicado, abre um formulário modal onde o administrador pode inserir os detalhes do novo usuário, como nome completo, e-mail, senha, RA, telefone ,tipo do usuário e permissão, de selecionar o papel que esse usuário desempenhará na plataforma.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figuras/addUsuario.jpeg}
+    \subsection{{Adicionando novo Usuário}}
+    \label{fig:credenciamento}
+\end{figure}
+
+\item A tela de credenciamento é essencial para a gestão eficiente dos participantes em eventos. Nessa seção, há uma lista dos eventos disponíveis e na tela dos Sub-eventos uma lista de todos os participantes cadastrados, com detalhes, como nome, e-mail, código do ingresso e status de credenciamento. Durante o evento, os organizadores podem utilizar esta tela para fazer o check-in dos participantes, confirmando sua presença.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figuras/credenciamento.jpeg}
+    \subsection{{Credenciamento de Participantes}}
+    \label{fig:credenciamento}
+\end{figure}
+
+
+\end{itemize}
 
 \section{Casos de uso}
 
+A seguir veremos alguns casos de uso principais e importantes que foram implementados no sistema, fornecendo uma visão clara das funcionalidades e das interações dos usuários, a tela inicial, com a página de eventos e usuários, destacando como cada um desses componentes contribui para a experiência completa da plataforma.
 
-\section{Diagrama de ER}
+\subsection{Página de Eventos (Super Admin)}
 
-Abaixo está o diagrama de Entidade/Relacionamentos que ilustra a estrutura e os relacionamentos entre as entidades do sistema:
+\begin{description}
+
+\item Ator principal: Administrador.
+
+\item Descrição: Permite que o administrador crie, edite, gerencie eventos acadêmicos, e crie sub-eventos.
+
+\item Pré-condição: O administrador deve estar logado na plataforma.
+
+\item Fluxo principal:
+
+1. O administrador acessa a plataforma e faz login.
+    
+2. No menu lateral o administrador seleciona a opção "Eventos".
+    
+3. O sistema exibe uma lista de eventos existentes.
+    
+4. O administrador pode criar um novo evento clicando em "Adicionar Evento".
+    
+5. O administrador preenche os detalhes do evento, como título, data, local, descrição.
+    
+6. O administrador salva as informações do evento.
+
+7. O administrador pode editar ou remover eventos existentes.
+
+8. O administrador pode adcionar sub-eventos.
+
+\item Fluxos alternativos:
+
+A. Se houver problemas ao salvar um evento, o sistema exibe uma mensagem de erro e orientações para correção.
+
+\item Pós-condição: O novo evento é adicionado à plataforma e disponível para visualização pelos usuários.
+
+\end{description}
+
+\subsection{Página de Participantes (Super Admin)}
+
+\begin{description}
+
+\item Ator principal: Administrador
+
+\item Descrição: Permite que o administrador visualize e gerencie a lista de usuários.
+
+\item Pré-condição: 
+    
+A. O administrador deve estar logado na plataforma.
+
+B. O evento deve estar cadastrado e ter participantes inscritos.
+
+\item Fluxo principal:
+
+1. O Admin acessa a plataforma e faz login.
+    
+2. O Admin clica na aba "Participantes".
+    
+4. O sistema exibe a lista de participantes.
+    
+5. O Admin pode editar ou remover participantes da lista.
+
+\item Fluxos alternativos:
+
+A. Se não houver participantes inscritos, o sistema exibe uma mensagem "Nenhum participante inscrito".
+
+\item Pós-condição: 
+
+A. As informações dos participantes são atualizadas conforme as ações do administrador.
+
+B. O sistema registra as alterações feitas pelo administrador para fins de auditoria.
+
+\end{description}
+
+\subsection{Página de Credenciamento (Super Admin)}
+
+\begin{description}
+
+\item Ator principal: Administrador
+
+\item Descrição: Permite que o administrador gerencie o credenciamento dos participantes nos eventos.
+
+\item Pré-condição: 
+
+A. O administrador deve estar logado na plataforma. \\
+B. O evento deve ter participantes inscritos. \\
+
+\item Fluxo principal:
+
+1. O administrador acessa a plataforma e faz login.
+
+2. O administrador seleciona a opção "Credenciamento".
+
+4. O sistema exibe uma lista de eventos gerenciados pelo administrador.
+    
+5. O administrador seleciona um evento da lista.
+
+6. O administrador seleciona um sub evento específico para gerenciar.
+    
+7. O sistema exibe a lista de participantes inscritos para aquele sub evento.
+    
+8. O administrador pode marcar a presença dos participantes à medida que eles chegam.
+    
+9. O administrador pode atualizar o status de credenciamento.
+
+\item Fluxos alternativos:
+
+B. Se não houver participantes inscritos, o sistema exibe uma mensagem "Nenhum participante inscrito".
+
+\item Pós-condição: O status de presença e credenciamento dos participantes é atualizado.
+
+\chapter{Diagrama de Classes}
+
+\section{Descrição do Diagrama}
+
+O diagrama de classes apresenta a estrutura estática do sistema, mostrando as classes que compõem o sistema e os relacionamentos entre elas. Cada classe representa uma entidade do sistema com seus atributos e métodos.
+
+\section{Elementos do Diagrama}
+
+Os elementos do diagrama de classes incluem:
+
+\begin{itemize}
+    \item \textbf{USER}: Representa os usuários do sistema, incluindo atributos como id, name, email, ra (registro acadêmico), phone, type, permission, e isSuperAdmin.
+    \item \textbf{ORDER}: Representa as ordens de compra feitas pelos usuários, incluindo atributos como id, userId, ticketIds, totalValue, paymentMethod, statusPayment, paymentAt, e code.
+    \item \textbf{TICKET}: Representa os ingressos de eventos, contendo atributos como id, orderId, subEventId, status, codigoIngresso, e createdAt.
+    \item \textbf{CERTIFICATE}: Representa os certificados emitidos para os usuários, contendo atributos como id, userId, subEventId, createdAt, e verificationCode.
+    \item \textbf{SUBMISSION}: Representa as submissões de trabalhos, contendo atributos como id, userId, subEventId, workTitle, description, archive, submissionDate, e status.
+    \item \textbf{EVENT}: Representa os eventos principais, contendo atributos como id, name, description, startDate, e endDate.
+    \item \textbf{SUBEVENT}: Representa os subeventos, contendo atributos como id, name, description, startDate, endDate, eventId, value, e quantity.
+    \item \textbf{ADDRESS}: Representa os endereços associados aos subeventos, contendo atributos como id, subEventId, block, e floor.
+    \item \textbf{ATTENDANCE}: Representa os registros de presença dos usuários nos subeventos, contendo atributos como id, userId, subEventId, checkinTime, e checkoutTime.
+\end{itemize}
+
+\section{Diagrama de Entidade & Relacionamento}
+
+Abaixo está o diagrama de Entidade & Relacionamento que ilustra a estrutura e os relacionamentos entre as entidades do sistema: 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.8\textwidth]{figuras/diagrama-entidades.png}
-\caption{Diagrama de Entidades do Sistema}
-\label{fig:diagrama-entidades.png}
+\includegraphics[width=0.8\textwidth]{figuras/erdiagram.png}
+\caption{Diagrama de Entidade & Relacionaemnto do Sistema}
+\label{fig:diagrama-classes}
 \end{figure}
 
 \begin{verbatim}
@@ -135,13 +386,35 @@ erDiagram
     }
 \end{verbatim}
 
+\chapter{Diagrama de Classes}
+
+\section{Descrição do Diagrama}
+
+O diagrama de classes apresenta a estrutura estática do sistema, mostrando as classes que compõem o sistema e os relacionamentos entre elas. Cada classe representa uma entidade do sistema com seus atributos e métodos.
+
+\section{Elementos do Diagrama}
+
+Os elementos do diagrama de classes incluem:
+
+\begin{itemize}
+    \item \textbf{User}: Representa os usuários do sistema, incluindo atributos como id, name, email, ra (registro acadêmico), phone, type, permission, e isSuperAdmin.
+    \item \textbf{Order}: Representa as ordens de compra feitas pelos usuários, incluindo atributos como id, userId, ticketIds, totalValue, paymentMethod, statusPayment, paymentAt, e code.
+    \item \textbf{Ticket}: Representa os ingressos de eventos, contendo atributos como id, orderId, subEventId, status, codigoIngresso, e createdAt.
+    \item \textbf{Certificate}: Representa os certificados emitidos para os usuários, contendo atributos como id, userId, subEventId, createdAt, e verificationCode.
+    \item \textbf{Submission}: Representa as submissões de trabalhos, contendo atributos como id, userId, subEventId, workTitle, description, archive, submissionDate, e status.
+    \item \textbf{Event}: Representa os eventos principais, contendo atributos como id, name, description, startDate, e endDate.
+    \item \textbf{SubEvent}: Representa os subeventos, contendo atributos como id, name, description, startDate, endDate, eventId, value, e quantity.
+    \item \textbf{Address}: Representa os endereços associados aos subeventos, contendo atributos como id, subEventId, block, e floor.
+    \item \textbf{Attendance}: Representa os registros de presença dos usuários nos subeventos, contendo atributos como id, userId, subEventId, checkinTime, e checkoutTime.
+\end{itemize}
+
 \section{Diagrama de Classes}
 
 Abaixo está o diagrama de classes que ilustra a estrutura e os relacionamentos entre as entidades do sistema:
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.8\textwidth]{figuras/diagrama-classes.png}
+\includegraphics[width=0.8\textwidth]{figuras/erdiagramclasses.png}
 \caption{Diagrama de Classes do Sistema}
 \label{fig:diagrama-classes}
 \end{figure}
@@ -303,4 +576,5 @@ classDiagram
     SubEvent "1" --o "0..*" Address
     User "1" --o "0..*" Attendance
     Attendance "0..*" --o "1" SubEvent
+    
 \end{verbatim}
